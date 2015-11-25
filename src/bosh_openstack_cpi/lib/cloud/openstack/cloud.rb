@@ -15,6 +15,7 @@ module Bosh::OpenStackCloud
     CONNECT_RETRY_COUNT = 5
 
     attr_reader :openstack
+    attr_reader :neutron
     attr_reader :registry
     attr_reader :glance
     attr_reader :volume
