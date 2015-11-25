@@ -84,7 +84,10 @@ module Bosh::OpenStackCloud
       begin
         Bosh::Common.retryable(@connect_retry_options) do |tries, error|
           @logger.error("Failed #{tries} times, last failure due to: #{error.inspect}") unless error.nil?
-          @openstack = Fog::Compute.new(openstack_params)
+          @neutron = Fog::Network.new(openstack_params)          
+	  @openstack = Fog::Compute.new(openstack_params)
+
+	
         end
       rescue Bosh::Common::RetryCountExceeded, Excon::Errors::ClientError, Excon::Errors::ServerError
         cloud_error('Unable to connect to the OpenStack Compute API. Check task debug log for details.')
@@ -276,6 +279,21 @@ module Bosh::OpenStackCloud
         if resource_pool['scheduler_hints']
           @logger.debug("Using scheduler hints: `#{resource_pool['scheduler_hints']}'")
         end
+
+	#patch for neutron Juno regression see 
+	ip=nics.first["v4_fixed_ip"]
+	if (ip !=nil)
+		@logger.debug("neutron patch on nics #{nics}")
+		# create port
+		net_id=nics.first["net_id"]
+		fixed_ips=[{"ip_address"=> ip}]  #miss "subnet_id"=> SUBNET_ID,  ?
+		@logger.debug("create port")
+		port=neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips)
+		@logger.debug("port created : #{port}")
+		nics=[{"net_id"=> net_id },{"port_id"=> port.id}]
+
+	end
+
 
         server_params = {
           :name => server_name,
