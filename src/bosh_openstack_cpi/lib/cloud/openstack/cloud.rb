@@ -285,9 +285,21 @@ module Bosh::OpenStackCloud
 	ip=nics.first["v4_fixed_ip"]
 	if (ip !=nil)
 		@logger.debug("neutron patch on nics #{nics}")
+
+		@logger.debug("find subnet")
+		subnets=@neutron.subnets.list
+		subnet=nil
+		subnets.each do |sn|
+		  if (sn.network_id == net_id)
+			subname = sn.id
+		  end
+		end
+
+		logger.debug("found subnet #{subnet}")
+
 		# create port
 		net_id=nics.first["net_id"]
-		fixed_ips=[{"ip_address"=> ip}]  #miss "subnet_id"=> SUBNET_ID,  ?
+		fixed_ips=[{"ip_address"=> ip},"subnet_id" => subnet]  #miss "subnet_id"=> SUBNET_ID,  ?
 		@logger.debug("create port for static ip #{ip} on network #{net_id}")
 		port=neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips)
 		@logger.debug("port created : #{port}")
