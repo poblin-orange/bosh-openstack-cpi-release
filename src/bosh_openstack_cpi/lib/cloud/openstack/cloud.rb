@@ -303,7 +303,7 @@ module Bosh::OpenStackCloud
 		fixed_ips=[{"ip_address"=> ip},"subnet_id" => subnet]  #miss "subnet_id"=> SUBNET_ID,  ?
 
                 @logger.debug("create port for static ip #{ip} on network #{net_id} subnet #{subnet}")
-		with_openstack { port=neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips, :name => server_id) }
+		with_openstack { port=neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips, :name => server_name) }
 		@logger.debug("port created : #{port}")
 		#nics=[{"net_id"=> net_id },{"port_id"=> port.id}]
 		nics=[{"port_id"=> port.id}]
