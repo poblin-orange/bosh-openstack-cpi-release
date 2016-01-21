@@ -391,12 +391,10 @@ module Bosh::OpenStackCloud
 
 	  #patch for static ip. delete port
 	  @logger.info("Deleting port `#{server_id}'...")
-          with_openstack { port=@neutron.ports.get(server_id)}
-          with_openstack { port.delete()
+          port = with_openstack { @neutron.ports.get(server_id)}
+          with_openstack { port.destroy }
 	  @logger.info("Deleted port `#{server_id}'...")
-
-          
-
+       
         else
           @logger.info("Server `#{server_id}' not found. Skipping.")
         end
