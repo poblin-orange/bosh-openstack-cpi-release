@@ -282,7 +282,7 @@ module Bosh::OpenStackCloud
 	#patch for neutron Juno regression see 
 	ip=nics.first["v4_fixed_ip"]
 	if (ip !=nil)
-		@logger.debug("neutron patch on nics #{nics}")
+		@logger.info("neutron patch on nics #{nics}")
 
 		net_id=nics.first["net_id"]
 
@@ -297,14 +297,14 @@ module Bosh::OpenStackCloud
                   end
                 end
 
-		logger.debug("found subnet #{subnet}")
+		logger.info("found subnet #{subnet}")
 
 		# create port
 		fixed_ips=[{"ip_address"=> ip},"subnet_id" => subnet]  #miss "subnet_id"=> SUBNET_ID,  ?
 
-                @logger.debug("create port for static ip #{ip} on network #{net_id} subnet #{subnet}")
-		with_openstack { port=neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips, :name => server_name) }
-		@logger.debug("port created : #{port}")
+        @logger.info("create port for static ip #{ip} on network #{net_id} subnet #{subnet}")
+		port = with_openstack { neutron.ports.create(:network_id => net_id, :fixed_ips => fixed_ips, :name => server_name) }
+		@logger.info("port created : #{port.name}")
 		#nics=[{"net_id"=> net_id },{"port_id"=> port.id}]
 		nics=[{"port_id"=> port.id}]
 
@@ -392,7 +392,7 @@ module Bosh::OpenStackCloud
 	  #patch for static ip. delete port
 	  @logger.info("Deleting port `#{server_id}'...")
           port = with_openstack { @neutron.ports.get(server_id)}
-          with_openstack { port.destroy }
+          port.destroy
 	  @logger.info("Deleted port `#{server_id}'...")
        
         else
