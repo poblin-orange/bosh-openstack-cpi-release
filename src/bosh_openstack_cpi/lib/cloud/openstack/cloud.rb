@@ -392,7 +392,7 @@ module Bosh::OpenStackCloud
 	  #patch for static ip. delete port
 	  @logger.info("Deleting port `#{server_id}'...")
           port = with_openstack { @neutron.ports.get(server_id)}
-          port.destroy
+          # to FIX port.destroy
 	  @logger.info("Deleted port `#{server_id}'...")
        
         else
